@@ -44,21 +44,3 @@ When scores become available, they will appear in the event summary (e.g., `FK N
 This creates a virtual environment on first run, installs dependencies, scrapes the schedule,
 generates `.ics` files in `cal/`, and commits + pushes to git.
 
-## Cron Setup (Raspberry Pi)
-
-```
-0 */6 * * * /path/to/lff-futsal-calendar/run.sh >> /var/log/lff-futsal.log 2>&1
-```
-
-## Project Structure
-
-```
-├── fetch_schedule.py    # master script
-├── requirements.txt     # Python dependencies
-├── run.sh              # Wrapper with venv setup
-├── cal/                # Generated .ics files
-│   ├── avclub.ics
-│   ├── fc-nikers.ics
-│   └── ...
-└── README.md
-```
