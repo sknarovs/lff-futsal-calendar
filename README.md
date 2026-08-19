@@ -9,15 +9,15 @@ Copy the raw `.ics` URL below and add it to your calendar app:
 
 | Team | Calendar URL |
 |------|-------------|
-| AVClub | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/main/cal/avclub.ics` |
-| FC Nikers | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/main/cal/fc-nikers.ics` |
-| FC Talsi | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/main/cal/fc-talsi.ics` |
-| FK Nīca/OtankiMill | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/main/cal/fk-nica-otankimill.ics` |
-| Futbola Parks Academy | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/main/cal/futbola-parks-academy.ics` |
-| Salaspils FA | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/main/cal/salaspils-fa.ics` |
-| Squad/Samgus Aizkraukle | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/main/cal/squad-samgus-aizkraukle.ics` |
-| TFK Beitar Riga | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/main/cal/tfk-beitar-riga.ics` |
-| TFK Salaspils | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/main/cal/tfk-salaspils.ics` |
+| AVClub | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/master/cal/avclub.ics` |
+| FC Nikers | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/master/cal/fc-nikers.ics` |
+| FC Talsi | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/master/cal/fc-talsi.ics` |
+| FK Nīca/OtankiMill | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/master/cal/fk-nica-otankimill.ics` |
+| Futbola Parks Academy | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/master/cal/futbola-parks-academy.ics` |
+| Salaspils FA | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/master/cal/salaspils-fa.ics` |
+| Squad/Samgus Aizkraukle | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/master/cal/squad-samgus-aizkraukle.ics` |
+| TFK Beitar Riga | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/master/cal/tfk-beitar-riga.ics` |
+| TFK Salaspils | `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/master/cal/tfk-salaspils.ics` |
 
 ### How to subscribe
 
@@ -53,7 +53,7 @@ generates `.ics` files in `cal/`, and commits + pushes to git.
 ## Project Structure
 
 ```
-├── fetch_schedule.py    # Main script
+├── fetch_schedule.py    # master script
 ├── requirements.txt     # Python dependencies
 ├── run.sh              # Wrapper with venv setup
 ├── cal/                # Generated .ics files
