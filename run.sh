@@ -8,8 +8,10 @@ VENV_DIR="$SCRIPT_DIR/.venv"
 if [ ! -d "$VENV_DIR" ]; then
     echo "Creating virtual environment..."
     python3 -m venv "$VENV_DIR"
-    "$VENV_DIR/bin/pip" install -r "$SCRIPT_DIR/requirements.txt"
 fi
+
+# Always ensure dependencies are installed
+"$VENV_DIR/bin/pip" install -q -r "$SCRIPT_DIR/requirements.txt"
 
 # Run the script
 "$VENV_DIR/bin/python" "$SCRIPT_DIR/fetch_schedule.py"
