@@ -13,6 +13,26 @@ final class IcsWriter {
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final DateTimeFormatter DATE_TIME = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
     private static final int MAX_LINE_OCTETS = 74;
+    private static final String TZID = "Europe/Riga";
+    /** Europe/Riga under EU daylight-saving rules; IcsWriterTest checks it against java.time. */
+    private static final List<String> VTIMEZONE = List.of(
+            "BEGIN:VTIMEZONE",
+            "TZID:" + TZID,
+            "BEGIN:DAYLIGHT",
+            "TZOFFSETFROM:+0200",
+            "TZOFFSETTO:+0300",
+            "TZNAME:EEST",
+            "DTSTART:19700329T030000",
+            "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU",
+            "END:DAYLIGHT",
+            "BEGIN:STANDARD",
+            "TZOFFSETFROM:+0300",
+            "TZOFFSETTO:+0200",
+            "TZNAME:EET",
+            "DTSTART:19701025T040000",
+            "RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU",
+            "END:STANDARD",
+            "END:VTIMEZONE");
 
     private IcsWriter() {
     }
@@ -25,6 +45,7 @@ final class IcsWriter {
         lines.add("PRODID:" + escape("-//LFF Futsal Virslīga//lv"));
         lines.add("CALSCALE:GREGORIAN");
         lines.add("X-WR-CALNAME:" + escape(cal.name()));
+        lines.addAll(VTIMEZONE);
         for (Match m : cal.matches()) {
             addEvent(lines, m, dtstamp);
         }
@@ -42,8 +63,8 @@ final class IcsWriter {
         lines.add("SUMMARY:" + escape(summary(m)));
         if (m.time() != null) {
             LocalDateTime start = m.date().atTime(m.time());
-            lines.add("DTSTART:" + DATE_TIME.format(start));
-            lines.add("DTEND:" + DATE_TIME.format(start.plusHours(1)));
+            lines.add("DTSTART;TZID=" + TZID + ":" + DATE_TIME.format(start));
+            lines.add("DTEND;TZID=" + TZID + ":" + DATE_TIME.format(start.plusHours(1)));
         } else {
             lines.add("DTSTART;VALUE=DATE:" + DATE.format(m.date()));
             lines.add("DTEND;VALUE=DATE:" + DATE.format(m.date().plusDays(1)));
