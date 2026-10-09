@@ -21,9 +21,10 @@ zone, games become 2-hour slots, and file names are transliterated to plain ASCI
 - **Laptop:** Fedora 44 Sway Atomic, x86_64. The native-image toolchain (`gcc`,
   `glibc-devel`, `zlib-devel`, `libstdc++-static`) cannot be installed on the host, so
   local native builds run in the existing `fedora-toolbox-44` toolbox.
-- **Production:** a Raspberry Pi with 64-bit Raspberry Pi OS (aarch64), driven by cron.
-  native-image cannot cross-compile, so GitHub Actions builds the Pi binary natively on
-  an ARM64 runner.
+- **Production:** a Raspberry Pi 3 (Cortex-A53, ARMv8.0, 1 GB RAM) with 64-bit Raspberry
+  Pi OS (aarch64), driven by cron. native-image cannot cross-compile, and a Pi 3 is too
+  small to build native images, so GitHub Actions builds the Pi binary natively on an
+  ARM64 runner.
 - **Subscriber URLs:** they stay
   `https://raw.githubusercontent.com/sknarovs/lff-futsal-calendar/master/cal/<slug>.ics`.
   The only renamed file is `fk-n-ca-otankimill.ics` → `fk-nica-otankimill.ics`, and
@@ -269,10 +270,15 @@ local. The next run's step 2 rebases it and its step 6 pushes it.
 
 - Gradle 9.8.1 wrapper with the Kotlin DSL and the `application` and
   `org.graalvm.buildtools.native` plugins. The Java toolchain is 25.
-- The native image is named `lff-futsal-calendar` and is built with
-  `-march=compatibility`. That flag is required: on ARM64, native-image targets
-  `armv8.1-a` by default, which the ARMv8.0 CPUs in the Pi 3 and Pi 4 can't run. GitHub's
-  ARM runners can run it, so CI would never notice the problem.
+- The native image is named `lff-futsal-calendar`. Every native build, in the toolbox
+  and in CI, passes `-march=compatibility` from `build.gradle.kts`.
+  - **What it does:** the flag limits the binary to the baseline ARMv8.0 instruction
+    set, which is what lets it run on the Pi 3's Cortex-A53 (and on a Pi 4 or 5).
+  - **Why it's needed:** native-image's ARM64 default is `armv8.1-a`, which uses newer
+    instructions, mainly atomics, that the Pi 3 lacks. A binary built with the default
+    would crash there with "Illegal instruction".
+  - **Why it lives in the build file:** GitHub's ARM runners have newer CPUs, so the CI
+    smoke test cannot catch this mistake. Nothing needs to be configured on the Pi.
 - Dependencies are jsoup (`implementation`) and JUnit 5 (`test`), pinned to exact
   versions in the build file.
 - GraalVM is GraalVM Community Edition for JDK 25. The laptop (SDKMAN) and CI (the
