@@ -1,6 +1,7 @@
 package lv.sknarovs.futsalcalendar;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -13,6 +14,8 @@ final class IcsWriter {
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final DateTimeFormatter DATE_TIME = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
     private static final int MAX_LINE_OCTETS = 74;
+    /** Most games take about two hours. */
+    private static final Duration GAME_DURATION = Duration.ofHours(2);
     private static final String TZID = "Europe/Riga";
     /** Europe/Riga under EU daylight-saving rules; IcsWriterTest checks it against java.time. */
     private static final List<String> VTIMEZONE = List.of(
@@ -64,7 +67,7 @@ final class IcsWriter {
         if (m.time() != null) {
             LocalDateTime start = m.date().atTime(m.time());
             lines.add("DTSTART;TZID=" + TZID + ":" + DATE_TIME.format(start));
-            lines.add("DTEND;TZID=" + TZID + ":" + DATE_TIME.format(start.plusHours(1)));
+            lines.add("DTEND;TZID=" + TZID + ":" + DATE_TIME.format(start.plus(GAME_DURATION)));
         } else {
             lines.add("DTSTART;VALUE=DATE:" + DATE.format(m.date()));
             lines.add("DTEND;VALUE=DATE:" + DATE.format(m.date().plusDays(1)));

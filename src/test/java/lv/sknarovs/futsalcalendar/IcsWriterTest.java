@@ -80,6 +80,17 @@ class IcsWriterTest {
     }
 
     @Test
+    void gamesLastTwoHours() {
+        assertTrue(write(timed("S")).contains("DTEND;TZID=Europe/Riga:20261010T180000\r\n"));
+    }
+
+    @Test
+    void lateGameEndsOnNextDay() {
+        Match m = new Match("1", LocalDate.of(2026, 10, 10), LocalTime.of(23, 0), "A", "B", null, "S", "");
+        assertTrue(write(m).contains("DTEND;TZID=Europe/Riga:20261011T010000\r\n"));
+    }
+
+    @Test
     void calendarContainsRigaVtimezoneBeforeEvents() {
         String vtimezone = String.join("\r\n",
                 "BEGIN:VTIMEZONE",
