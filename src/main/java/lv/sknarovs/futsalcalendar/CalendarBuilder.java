@@ -1,5 +1,6 @@
 package lv.sknarovs.futsalcalendar;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -31,9 +32,10 @@ final class CalendarBuilder {
         return calendars;
     }
 
-    /** File-system-safe name for a team. */
+    /** File-system-safe name for a team; accents are dropped, so "Nīca" becomes "nica". */
     static String slug(String name) {
-        String s = name.toLowerCase(Locale.ROOT).strip();
+        String s = Normalizer.normalize(name, Normalizer.Form.NFD).replaceAll("\\p{M}", "");
+        s = s.toLowerCase(Locale.ROOT).strip();
         s = s.replaceAll("[^a-z0-9]+", "-");
         return s.replaceAll("^-+|-+$", "");
     }

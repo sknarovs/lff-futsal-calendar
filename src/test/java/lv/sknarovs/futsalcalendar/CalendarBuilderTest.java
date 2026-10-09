@@ -9,11 +9,17 @@ import org.junit.jupiter.api.Test;
 
 class CalendarBuilderTest {
     @Test
-    void slugMatchesPythonForNow() {
+    void slugIsLowercaseAsciiWithHyphens() {
         assertEquals("fc-talsi", CalendarBuilder.slug("FC Talsi"));
         assertEquals("squad-samgus-aizkraukle", CalendarBuilder.slug("Squad/Samgus Aizkraukle"));
-        assertEquals("fk-n-ca-otankimill", CalendarBuilder.slug("FK Nīca/OtankiMill"));
         assertEquals("a-b", CalendarBuilder.slug("--A  b--"));
+    }
+
+    @Test
+    void slugTransliteratesLatvianLetters() {
+        assertEquals("fk-nica-otankimill", CalendarBuilder.slug("FK Nīca/OtankiMill"));
+        assertEquals("aceegiklnsuz", CalendarBuilder.slug("āčēēģīķļņšūž"));
+        assertEquals("aceegiklnsuz", CalendarBuilder.slug("ĀČĒĒĢĪĶĻŅŠŪŽ"));
     }
 
     @Test
