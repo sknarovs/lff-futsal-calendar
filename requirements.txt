@@ -1,3 +1,0 @@
-icalendar>=5.0
-beautifulsoup4>=4.12
-requests>=2.31
