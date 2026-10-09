@@ -6,6 +6,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /** Downloads the schedule page. */
 final class ScheduleFetcher {
@@ -16,15 +19,29 @@ final class ScheduleFetcher {
     }
 
     static String fetch(URI uri) throws IOException, InterruptedException {
+        return fetch(uri, TIMEOUT);
+    }
+
+    static String fetch(URI uri, Duration timeout) throws IOException, InterruptedException {
         try (HttpClient client = HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.NORMAL)
-                .connectTimeout(TIMEOUT)
+                .connectTimeout(timeout)
                 .build()) {
             HttpRequest request = HttpRequest.newBuilder(uri)
-                    .timeout(TIMEOUT)
+                    .timeout(timeout)
                     .header("User-Agent", "LFF-Futsal-Calendar/1.0")
                     .build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            // The request timeout stops counting once headers arrive, so bound the whole download too.
+            HttpResponse<String> response;
+            try {
+                response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                        .get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                client.shutdownNow(); // close() would otherwise wait for the stalled exchange
+                throw new IOException("Download from " + uri + " timed out after " + timeout.toSeconds() + " s");
+            } catch (ExecutionException e) {
+                throw e.getCause() instanceof IOException io ? io : new IOException(e.getCause());
+            }
             if (response.statusCode() / 100 != 2) {
                 throw new IOException("HTTP " + response.statusCode() + " from " + uri);
             }

@@ -8,12 +8,20 @@ set -euo pipefail
 
 REPO=sknarovs/lff-futsal-calendar
 BIN=bin/lff-futsal-calendar
+# Upper bounds so a stalled network can never leave a run hanging (seconds).
+NET_TIMEOUT=300
 
 main() {
     cd "$(dirname "$0")"
-    git pull -q --rebase --autostash
+    # Never let two runs (e.g. a slow one and the next cron tick) touch git at once.
+    exec 9>.run.lock
+    if ! flock -n 9; then
+        echo "Another run is still in progress; skipping." >&2
+        exit 0
+    fi
+    timeout "$NET_TIMEOUT" git pull -q --rebase --autostash
     update_binary
-    "$BIN"
+    timeout "$NET_TIMEOUT" "$BIN"
     publish
 }
 
@@ -47,7 +55,7 @@ publish() {
         return
     fi
     git commit -q -m "Update calendars ($(date '+%Y-%m-%d %H:%M'))"
-    git push -q
+    timeout "$NET_TIMEOUT" git push -q
     echo "Committed and pushed."
 }
 
