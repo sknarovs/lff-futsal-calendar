@@ -1,0 +1,42 @@
+name: Release
+
+# Pushing a tag such as v1.2.0 builds the Raspberry Pi (aarch64) binary and
+# publishes it as a GitHub Release. Tags containing "-" (v1.2.0-rc.1) become
+# prereleases, which the Pi's run.sh ignores.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v7
+
+      # Oracle Linux 8 (glibc 2.28) keeps the binary runnable on every 64-bit
+      # Raspberry Pi OS. Keep this tag in sync with the GraalVM CE version in the README.
+      # gradlew needs xargs, which the slim image lacks.
+      - name: Test and build native binary
+        run: |
+          docker run --rm -v "$PWD:/work" -w /work --entrypoint bash \
+            ghcr.io/graalvm/native-image-community:25i4-25.0.4.1.1-ol8-20260922 \
+            -c 'microdnf install -y findutils >/dev/null && ./gradlew --no-daemon test nativeCompile'
+          cp build/native/nativeCompile/lff-futsal-calendar lff-futsal-calendar-linux-aarch64
+
+      - name: Smoke test against lff.lv
+        run: |
+          dir=$(mktemp -d)
+          (cd "$dir" && "$GITHUB_WORKSPACE/lff-futsal-calendar-linux-aarch64")
+          ls "$dir"/cal/*.ics
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          prerelease=()
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then prerelease=(--prerelease); fi
+          gh release create "$GITHUB_REF_NAME" lff-futsal-calendar-linux-aarch64 \
+            --generate-notes "${prerelease[@]}"
