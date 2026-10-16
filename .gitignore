@@ -1,5 +1,5 @@
 .gradle/
 build/
-bin/
 .idea/
-.run.lock
+# Calendars written by local runs; the published ones live on the master branch.
+/cal/

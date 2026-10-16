@@ -41,8 +41,23 @@ this repository. How often it runs is set in the crontab.
 
 - `lff-futsal-calendar` is a Java program compiled to a native binary with GraalVM. It fetches
   the schedule and writes `cal/<team>.ics` in the current directory. Nothing else: no git, no scheduling.
-- `run.sh` is the Pi's cron entry point. It runs `git pull`, installs a newer release binary into
-  `bin/` when one exists, runs the binary, then commits and pushes the changed calendars.
+- `run.sh` (on the `master` branch) is the Pi's cron entry point. It runs `git pull`, installs a
+  newer release binary into `bin/` when one exists, runs the binary, then commits and pushes the
+  changed calendars.
+
+## Branches
+
+| Branch | Contents |
+|--------|----------|
+| `dev` (default) | The Java source, the build, CI and docs. Releases are tagged here. |
+| `master` | Only `run.sh` and the generated `cal/*.ics`, which the Pi commits. It shares no history with `dev`. |
+
+The Pi clones only `master`, so it never downloads the source code. The subscription URLs point
+at `cal/` on `master`, so the branch must keep its name and the files must stay where they are.
+
+To change `run.sh`, check out `master` (for example with
+`git worktree add ../lff-futsal-calendar-master master`) and pull before you push: the Pi commits
+there on every run.
 
 ## Development
 
@@ -85,12 +100,13 @@ which the Pi ignores, which makes them useful for trying a build first.
 
 ## Raspberry Pi Setup
 
-Requires a 64-bit Raspberry Pi OS, `git` and `curl`.
+Requires a 64-bit Raspberry Pi OS, `git` and `curl`. Clone only the `master` branch, over SSH so
+the Pi can push:
 
 ```bash
-git clone git@github.com:sknarovs/lff-futsal-calendar.git   # SSH, so the Pi can push
+git clone --single-branch --branch master git@github.com:sknarovs/lff-futsal-calendar.git
 cd lff-futsal-calendar
-./run.sh                                                      # installs the latest release into bin/
+./run.sh   # installs the latest release into bin/
 ```
 
 Then add a crontab entry (`crontab -e`) on whatever schedule you like, for example:
